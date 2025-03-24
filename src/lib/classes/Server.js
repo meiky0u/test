@@ -38,6 +38,7 @@ export class Server {
                 .catch(err => `An error has occured while attempting to load fastify plugins! => ${err}`);
 
             console.log('attempting to load the routes.....');
+
             await fastify()
                 .register(import('../../routes/index.js'))
                 .then(() => console.log('Successfully loaded the routes!'))
@@ -55,6 +56,5 @@ export class Server {
         catch (err) {
             console.error(err);
         }
-
     }
 };
