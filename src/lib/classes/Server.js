@@ -4,6 +4,10 @@ import fastify from 'fastify';
 import cookie from '@fastify/cookie';
 import cors from '@fastify/cors';
 
+// if (!process.env.TOKEN_KEY) {
+//     throw new Error('Environment variable TOKEN_KEY is not defined. Please set it before starting the server.');
+// }
+
 export class Server {
     constructor(
         {
@@ -19,38 +23,49 @@ export class Server {
             await mongoose
                 .connect(this.mongodbURI)
                 .then(() => console.log('Successfully connected to MongoDB!'))
-                .catch(err => `An error has occured while attempting to connect to MongoDB! => ${err}`);
+                .catch(err => {
+                    console.error(`An error has occurred while attempting to connect to MongoDB! => ${err}`);
+                    throw err;
+                });
 
             console.log('Loading fastify plugins.....');
 
-            await fastify(
-                {
-                    logger: true
-                }
-            )
+            const app = fastify({
+                logger: true
+            });
+
+            await app
                 .register(cors)
-                .register(cookie,
-                    {
-                        secret: process.env.TOKEN_KEY,
-                        httpOnly: false,
-                    })
+                .register(cookie, {
+                    secret: process.env.TOKEN_KEY,
+                    httpOnly: false,
+                })
                 .then(() => console.log('Successfully loaded the fastify plugins!'))
-                .catch(err => `An error has occured while attempting to load fastify plugins! => ${err}`);
+                .catch(err => {
+                    console.error(`An error has occurred while attempting to load the fastify plugins! => ${err}`);
+                    throw err;
+                });
 
-            console.log('attempting to load the routes.....');
+            console.log('Attempting to load the routes.....');
 
-            await fastify()
-                .register(import('../../routes/index.js'))
-                .then(() => console.log('Successfully loaded the routes!'))
-                .catch(err => `An error has occured while attempting to load the routes! => ${err}`);
+            // await app
+            //     .register(import('../../routes/index.js'))
+            //     .then(() => console.log('Successfully loaded the routes!'))
+            //     .catch(err => {
+            //         console.error(`An error has occurred while attempting to load the routes! => ${err}`);
+            //         throw err;
+            //     });
 
             console.log('Attempting to start the server.....');
 
-            await fastify().listen({
+            await app.listen({
                 port: 8080
             })
                 .then(() => console.log('Successfully started the server! on port 8080'))
-                .catch(err => `An error has occured while attempting to start the server! => ${err}`);
+                .catch(err => {
+                    console.error(`An error has occurred while attempting to start the server! => ${err}`);
+                    throw err;
+                });
         }
 
         catch (err) {
