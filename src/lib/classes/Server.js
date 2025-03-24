@@ -46,7 +46,7 @@ export class Server {
                     throw err;
                 });
 
-            console.log('Attempting to load the routes.....');
+            // console.log('Attempting to load the routes.....');
 
             // await app
             //     .register(import('../../routes/index.js'))
