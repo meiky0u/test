@@ -1,19 +1,15 @@
 import mongoose from 'mongoose';
-
-/**
- * Initializes a Fastify instance with logging enabled.
- *
- * @constant {FastifyInstance} fastify - The Fastify instance configured with a logger.
- */
 import fastify from 'fastify';
 
 import cookie from '@fastify/cookie';
 import cors from '@fastify/cors';
 
 export class Server {
-  constructor({
+  constructor(
+  {
     mongodbURI
-  }) {
+  })
+  {
     this.mongodbURI = mongodbURI;
   };
 
@@ -21,28 +17,36 @@ export class Server {
     try {
       console.log("Attempting to connect to MongoDB.....");
 
-      await mongoose.connect(this.mongodbURI);
-
-      console.log('Successfully connected to MongoDB!');
+      await mongoose
+                    .connect(this.mongodbURI)
+                    .then(() => console.log('Successfully connected to MongoDB!'))
+                    .catch(err => `An error has occured while attempting to connect to MongoDB! => ${err}`);
 
       console.log('Loading fastify plugins.....');
          
-      fastify({
+      await fastify(
+      {
         logger: true
-      })
-               .register(cors)
-               .register(cookie, {
-                   secret: process.env.TOKEN_KEY,
-                   httpOnly: false,
-               });
-        
-      console.log('Successfully loaded fastify plugins!');
+      }
+      )
+             .register(cors)
+             .register(cookie,
+                {
+                     secret: process.env.TOKEN_KEY,
+                     httpOnly: false,
+                })
+            .then(() => console.log('Successfully loaded the fastify plugins!'))
+            .catch(err => `An error has occured while attempting to load fastify plugins! => ${err}`);
 
-      fastify().register(import('../../routes/index.js'));
+     console.log('attempting to load the routes.....');
+      await fastify()
+            .register(import('../../routes/index.js'))
+            .then(() => console.log('Successfully loaded the routes!'))
+            .catch(err => `An error has occured while attempting to load the routes! => ${err}`);
 
       console.log('Attempting to start the server.....');
       
-      fastify().listen({
+      await fastify().listen({
             port: 8080
       })
         .then(() => console.log('Successfully started the server! on port 8080'))
