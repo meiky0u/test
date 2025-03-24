@@ -27,7 +27,9 @@ export class Server {
 
       console.log('Loading fastify plugins.....');
          
-      fastify()
+      fastify({
+        logger: true
+      })
                .register(cors)
                .register(cookie, {
                    secret: process.env.TOKEN_KEY,
