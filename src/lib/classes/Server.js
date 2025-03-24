@@ -58,10 +58,12 @@ export class Server {
 
             console.log('Attempting to start the server.....');
 
+            const port = process.env.PORT || 8080;
+
             await app.listen({
-                port: 8080
+                port
             })
-                .then(() => console.log('Successfully started the server! on port 8080'))
+                .then(() => console.log(`Successfully started the server! on port ${port}`))
                 .catch(err => {
                     console.error(`An error has occurred while attempting to start the server! => ${err}`);
                     throw err;
