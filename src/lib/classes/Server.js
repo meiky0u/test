@@ -1,18 +1,27 @@
+
+// Required modules.
 import mongoose from 'mongoose';
 import fastify from 'fastify';
+//
 
+// Required plugins.
 import cookie from '@fastify/cookie';
 import cors from '@fastify/cors';
+//
 
-
+// Required routes.
 import register from '../../routes/auth.js';
+//
 
+// Required modules.
 import dotenv from 'dotenv';
+//
 
 dotenv.config({
     path: '../.env'
 });
 
+// Checks if the environment variable TOKEN_KEY is defined.
 if (!process.env.TOKEN_KEY) throw new Error('Environment variable TOKEN_KEY is not defined. Please set it before starting the server.');
 
 export class Server {
