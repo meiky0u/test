@@ -50,15 +50,15 @@ export class Server {
 
             console.log('Attempting to load the routes.....');
 
-            await app
-                .register(
-                    register
-                    // .then(() => console.log('Successfully loaded the routes!'))
-                    // .catch(err => {
-                    //     console.error(`An error has occurred while attempting to load the routes! => ${err}`);
-                    //     throw err;
-                    // }))
-                )
+            try {
+                await app.register(register)
+
+                console.log('Successfully loaded the routes!');
+            } catch (err) {
+                console.error(`An error has occurred while attempting to load the routes! => ${err}`);
+
+                throw err;
+            };
 
             console.log('Attempting to start the server.....');
 
