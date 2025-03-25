@@ -2,6 +2,7 @@
 // Required modules.
 import mongoose from 'mongoose';
 import fastify from 'fastify';
+import dotenv from 'dotenv';
 //
 
 // Required plugins.
@@ -11,10 +12,6 @@ import cors from '@fastify/cors';
 
 // Required routes.
 import register from '../../routes/auth.js';
-//
-
-// Required modules.
-import dotenv from 'dotenv';
 //
 
 dotenv.config({
