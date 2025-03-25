@@ -4,6 +4,8 @@ import fastify from 'fastify';
 import cookie from '@fastify/cookie';
 import cors from '@fastify/cors';
 
+
+import register from '../../routes/auth.js';
 // if (!process.env.TOKEN_KEY) {
 //     throw new Error('Environment variable TOKEN_KEY is not defined. Please set it before starting the server.');
 // }
@@ -46,15 +48,17 @@ export class Server {
                     throw err;
                 });
 
-            // console.log('Attempting to load the routes.....');
+            console.log('Attempting to load the routes.....');
 
-            // await app
-            //     .register(import('../../routes/index.js'))
-            //     .then(() => console.log('Successfully loaded the routes!'))
-            //     .catch(err => {
-            //         console.error(`An error has occurred while attempting to load the routes! => ${err}`);
-            //         throw err;
-            //     });
+            await app
+                .register(
+                    register
+                    // .then(() => console.log('Successfully loaded the routes!'))
+                    // .catch(err => {
+                    //     console.error(`An error has occurred while attempting to load the routes! => ${err}`);
+                    //     throw err;
+                    // }))
+                )
 
             console.log('Attempting to start the server.....');
 
