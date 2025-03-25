@@ -6,9 +6,14 @@ import cors from '@fastify/cors';
 
 
 import register from '../../routes/auth.js';
-// if (!process.env.TOKEN_KEY) {
-//     throw new Error('Environment variable TOKEN_KEY is not defined. Please set it before starting the server.');
-// }
+
+import dotenv from 'dotenv';
+
+dotenv.config({
+    path: '../.env'
+});
+
+if (!process.env.TOKEN_KEY) throw new Error('Environment variable TOKEN_KEY is not defined. Please set it before starting the server.');
 
 export class Server {
     constructor(
