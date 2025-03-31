@@ -1,8 +1,5 @@
 import joi from 'joi';
 
-// todo: isPhoneNumberValid function.
-// todo: isPasswordStrong function.
-
 const registerSchema = joi.object({
     firstName: joi
         .string()

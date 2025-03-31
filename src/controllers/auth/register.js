@@ -1,26 +1,29 @@
-// import 
-import registerSchema from '../../schemas/auth/register.js';
-import bcrypt from 'bcrypt';
-import User from '../../models/User.js';
+// Required modules.
 import parsePhoneNumber from 'libphonenumber-js';
+import bcrypt from 'bcrypt';
+//
+// Required schemas.
+import registerSchema from '../../schemas/auth/register.js';
+//
 
+// Required models.
+import User from '../../models/User.js';
+//
 export default function register(fastify, options, done) {
     fastify.post('/api/v1/auth/register', async (req, rep ) => {
         try {
             console.log('Attempting to validate the request body.....');
 
-            req.local = { 
-                body: await registerSchema
-                            .validateAsync(req.body)
-                            .then(() => {
-                                console.log('Successfully validated the request body!');
-                                return req.body;
-                            })
-                            .catch(err => {
-                                console.error(`An error has occurred while attempting to validate the request body! => ${err}`);
-                                throw err;
-                            })
-             };
+            await registerSchema
+            .validateAsync(req.body)
+            .then(() => {
+                console.log('Successfully validated the request body!');
+                return req.body;
+            })
+            .catch(err => {
+                console.error(`An error has occurred while attempting to validate the request body! => ${err}`);
+                throw err;
+            });
 
              // Checks if the user already exists in the database.
              console.log('Attempting to check if the user already exists in the database.....');
