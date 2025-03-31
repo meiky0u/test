@@ -71,8 +71,12 @@ export default function register(fastify, options, done) {
             });
 
             console.log('Successfully created the user!');
+
             return rep.status(201).send(user);
         } catch (error) {
+            // TODO: Service that sends the error to a logging service.
+            console.error(`An error has occurred while attempting to register the user! => ${error}`);
+            
             return rep.status(500).send({ message: error.message });
         }
     });
