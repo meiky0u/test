@@ -50,17 +50,17 @@ export default function register(fastify, options, done) {
 
             // Parses phone number.
             let parsedPhoneNumber = null;
-            if (req.local.body.phoneNumber) {
-                const phoneNumber = req.local.body.phoneNumber;
+            if (req.body.phoneNumber) {
+                const phoneNumber = req.body.phoneNumber;
                 parsedPhoneNumber = parsePhoneNumber(phoneNumber);
             }
 
             // Encrypts the user password.
-            const encryptedPassword = await bcrypt.hash(req.local.body.password, 10);
+            const encryptedPassword = await bcrypt.hash(req.body.password, 10);
 
             // Creates the user in the database.
             const user = await User.create({
-                ...req.local.body,
+                ...req.body,
                 phoneNumber: parsedPhoneNumber,
                 password: encryptedPassword,
                 verification: {
@@ -76,7 +76,7 @@ export default function register(fastify, options, done) {
         } catch (error) {
             // TODO: Service that sends the error to a logging service.
             console.error(`An error has occurred while attempting to register the user! => ${error}`);
-            
+
             return rep.status(500).send({ message: error.message });
         }
     });
