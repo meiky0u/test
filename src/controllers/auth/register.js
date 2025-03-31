@@ -26,6 +26,7 @@ export default function register(fastify, options, done) {
 
             // Checks if the user already exists in the database.
             console.log('Attempting to check if the user already exists in the database.....');
+
             const doesUserExist = await User.findOne({
                 $or: [
                     { emailAddress: req.body.emailAddress },
@@ -34,6 +35,7 @@ export default function register(fastify, options, done) {
                 ]
             });
 
+            // If the user already exists, return a 409 error.
             if (doesUserExist) {
                 const { emailAddress, username, phoneNumber } = doesUserExist;
 
@@ -46,15 +48,17 @@ export default function register(fastify, options, done) {
                 return rep.status(409).send({ message: takenFields });
             }
 
-            // Parse phone number.
+            // Parses phone number.
             let parsedPhoneNumber = null;
             if (req.local.body.phoneNumber) {
                 const phoneNumber = req.local.body.phoneNumber;
                 parsedPhoneNumber = parsePhoneNumber(phoneNumber);
             }
 
+            // Encrypts the user password.
             const encryptedPassword = await bcrypt.hash(req.local.body.password, 10);
 
+            // Creates the user in the database.
             const user = await User.create({
                 ...req.local.body,
                 phoneNumber: parsedPhoneNumber,
