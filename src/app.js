@@ -13,3 +13,5 @@ const server = new Server({
 server.start({
     mongodbURI: process.env.MONGODB_URI
 });
+
+export default server;
