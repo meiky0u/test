@@ -19,7 +19,7 @@ export default function register(fastify, options, done) {
 
                 console.log('Successfully validated the request body!');
             } catch (error) {
-                console.error(`An error has occurred while attempting to validate the request body! => ${err}`);
+                console.error(`An error has occurred while attempting to validate the request body! => ${error}`);
 
                 return rep.status(400).send({
                     message: 'Invalid request body!',
