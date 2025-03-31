@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { type } from 'os';
 
 const userSchema = new mongoose.Schema({
     firstName: {
@@ -41,15 +42,25 @@ const userSchema = new mongoose.Schema({
             default: 0
         },
         tokens: {
-            passwordReset: {
-                type: Array
-            }
+            passwordReset: [
+                {
+                    value: {
+                        type: String
+                    },
+                    createdAt: {
+                        type: Date
+                    },
+                    expiresAt: {
+                        type: Date
+                    }
+
+                }
+            ]
         }
     },
     verification: {
         isVerified: {
             type: Boolean,
-            enum: [true, false],
             default: false
         },
         code: {
@@ -58,11 +69,11 @@ const userSchema = new mongoose.Schema({
             },
             createdAt: {
                 type: Date,
-                default: new Date()
+                default: () => Date.now()
             },
             expiresAt: {
                 type: Date,
-                default:  new Date(new Date().setHours(new Date().getHours() + 24))
+                default: () => new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now.
             }
         }
     },
