@@ -58,18 +58,20 @@ export default function register(fastify, options, done) {
 
              const encryptedPassword = await bcrypt.hash(req.local.body.password, 10);
 
-             const verificationCode = {
-                code: {
-                    value: Math.random().toString(36).substring(2, 8)
+             const user = await User.create({
+                ...req.local.body,
+                phoneNumber: parsedPhoneNumber,
+                password: encryptedPassword,
+                verification: {
+                    code: {
+                        value: Math.random().toString(36).substring(2, 8)
+                    }
                 }
-             };
-
-             const user = await User.create(req.local.body, parsedPhoneNumber, encryptedPassword, verificationCode);
+             });
 
              console.log('Successfully created the user!');
              return rep.status(201).send(user);
         } catch (error) {
-            console.log(error)
             return rep.status(500).send({ message: error.message });
         };
     })
