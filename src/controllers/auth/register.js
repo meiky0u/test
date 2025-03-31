@@ -72,8 +72,18 @@ export default function register(fastify, options, done) {
             }
 
             // Encrypts the user password.
-            const encryptedPassword = await bcrypt.hash(req.body.password, 10);
+            let encryptedPassword;
 
+            try {
+                encryptedPassword = await bcrypt.hash(req.body.password, 10);
+            } catch (error) {
+                console.error(`An error has occurred while attempting to encrypt the user password! => ${error}`);
+
+                return rep.status(500).send({
+                    message: 'An internal server error occurred.',
+                });
+            };
+            
             // Creates the user in the database.
             const user = await User.create({
                 ...req.body,
