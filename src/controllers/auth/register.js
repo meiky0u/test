@@ -68,7 +68,7 @@ export default function register(fastify, options, done) {
                 parsedPhoneNumber = parsePhoneNumber(phoneNumber);
 
                 // Checks if the phone number is valid. If the phone number is not valid, return a 400 error.
-                if(!parsedPhoneNumber || !parsedPhoneNumber.isValid()) return rep.status(400).send({ message: 'Invalid request body!' });
+                if(!parsedPhoneNumber || !parsedPhoneNumber.isValid()) return rep.status(400).send({ message: 'Invalid phone number!' });
             }
 
             // Encrypts the user password.
@@ -83,7 +83,7 @@ export default function register(fastify, options, done) {
                     message: 'An internal server error occurred.',
                 });
             };
-            
+
             // Creates the user in the database.
             const user = await User.create({
                 ...req.body,
