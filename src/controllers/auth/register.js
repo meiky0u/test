@@ -29,13 +29,23 @@ export default function register(fastify, options, done) {
             // Checks if the user already exists in the database.
             console.log('Attempting to check if the user already exists in the database.....');
 
-            const doesUserExist = await User.findOne({
-                $or: [
-                    { emailAddress: req.body.emailAddress },
-                    { username: req.body.username },
-                    { phoneNumber: req.body.phoneNumber }
-                ]
-            });
+            let doesUserExist;
+
+            try {
+                doesUserExist = await User.findOne({
+                    $or: [
+                        { emailAddress: req.body.emailAddress },
+                        { username: req.body.username },
+                        { phoneNumber: req.body.phoneNumber }
+                    ]
+                });
+            } catch (error) {
+                console.error(`An error has occurred while attempting to check if the user already exists in the database! => ${error}`);
+
+                return rep.status(500).send({
+                    message: 'An internal server error occurred.',
+                });
+            };
 
             // If the user already exists, return a 409 error.
             if (doesUserExist) {
@@ -47,18 +57,18 @@ export default function register(fastify, options, done) {
                     phoneNumber?.number && `${phoneNumber.number} is already taken!`
                 ].filter(Boolean);
 
-                return rep.status(409).send({ message: takenFields });
+                return rep.status(409).send({ message: 'Conflict', details: takenFields });
             }
 
             // Parses phone number.
-            let parsedPhoneNumber = null;
+            let parsedPhoneNumber;
 
             if (req.body.phoneNumber) {
                 const phoneNumber = req.body.phoneNumber;
                 parsedPhoneNumber = parsePhoneNumber(phoneNumber);
 
                 // Checks if the phone number is valid. If the phone number is not valid, return a 400 error.
-                if(!parsedPhoneNumber || !parsedPhoneNumber.isValid()) return rep.status(400).send({ message: 'Invalid phone number!' });
+                if(!parsedPhoneNumber || !parsedPhoneNumber.isValid()) return rep.status(400).send({ message: 'Invalid request body!' });
             }
 
             // Encrypts the user password.
