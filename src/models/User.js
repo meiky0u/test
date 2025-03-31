@@ -19,16 +19,13 @@ const userSchema = new mongoose.Schema({
     },
     phoneNumber: {
         countryCallingCode: {
-            type: String,
-            required: [true, 'Country calling code is required']
+            type: String
         },
         nationalNumber: {
-            type: String,
-            required: [true, 'National number is required']
+            type: String
         },
         number: {
-            type: String,
-            required: [true, 'Number is required']
+            type: String
         }
     },
     username: {
