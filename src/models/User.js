@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { type } from 'os';
 
 const userSchema = new mongoose.Schema({
     firstName: {
@@ -53,7 +52,6 @@ const userSchema = new mongoose.Schema({
                     expiresAt: {
                         type: Date
                     }
-
                 }
             ]
         }
@@ -79,7 +77,7 @@ const userSchema = new mongoose.Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now()
+        default: () => Date.now()
     }
 });
 
