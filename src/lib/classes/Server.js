@@ -19,7 +19,7 @@ dotenv.config({
 });
 
 // Checks if the environment variable TOKEN_KEY is defined.
-if (!process.env.TOKEN_KEY) throw new Error('Environment variable TOKEN_KEY is not defined. Please set it before starting the server.');
+// if (!process.env.TOKEN_KEY) throw new Error('Environment variable TOKEN_KEY is not defined. Please set it before starting the server.');
 
 export class Server {
     constructor(
