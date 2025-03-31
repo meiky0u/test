@@ -1,0 +1,2 @@
+Error logging.
+Avoid Nested try-catch: Nested try-catch blocks can make the code harder to read and maintain. Instead, you can handle specific errors (like validation errors) by checking the error type or message.

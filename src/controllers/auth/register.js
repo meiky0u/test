@@ -1,6 +1,7 @@
 // Required modules.
 import parsePhoneNumber from 'libphonenumber-js';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 
 // Required schemas.
 import registerSchema from '../../schemas/auth/register.js';
@@ -13,16 +14,17 @@ export default function register(fastify, options, done) {
         try {
             console.log('Attempting to validate the request body.....');
 
-            await registerSchema
-                .validateAsync(req.body)
-                .then(() => {
-                    console.log('Successfully validated the request body!');
-                    return req.body;
-                })
-                .catch(err => {
-                    console.error(`An error has occurred while attempting to validate the request body! => ${err}`);
-                    throw err;
+            try {
+                await registerSchema.validateAsync(req.body, { abortEarly: false });
+
+                console.log('Successfully validated the request body!');
+            } catch (error) {
+                console.error(`An error has occurred while attempting to validate the request body! => ${err}`);
+
+                return rep.status(400).send({
+                    message: 'Invalid request body!',
                 });
+            }
 
             // Checks if the user already exists in the database.
             console.log('Attempting to check if the user already exists in the database.....');
@@ -50,10 +52,13 @@ export default function register(fastify, options, done) {
 
             // Parses phone number.
             let parsedPhoneNumber = null;
-            
+
             if (req.body.phoneNumber) {
                 const phoneNumber = req.body.phoneNumber;
                 parsedPhoneNumber = parsePhoneNumber(phoneNumber);
+
+                // Checks if the phone number is valid. If the phone number is not valid, return a 400 error.
+                if(!parsedPhoneNumber.isValid()) return rep.status(400).send({ message: 'Invalid phone number!' });
             }
 
             // Encrypts the user password.
@@ -66,19 +71,22 @@ export default function register(fastify, options, done) {
                 password: encryptedPassword,
                 verification: {
                     code: {
-                        value: Math.random().toString(36).substring(2, 8)
+                        value: crypto.randomBytes(3).toString('hex')
                     }
                 }
             });
 
             console.log('Successfully created the user!');
 
-            return rep.status(201).send(user);
+            // Removes the password and verification code from the user object before sending it to the client.
+            const { password, verification, ...safeUser } = user.toObject();
+            
+            return rep.status(201).send(safeUser);
         } catch (error) {
             // TODO: Service that sends the error to a logging service.
             console.error(`An error has occurred while attempting to register the user! => ${error}`);
 
-            return rep.status(500).send({ message: error.message });
+            return rep.status(500).send({ message: 'An internal server error occurred.' });
         }
     });
 
