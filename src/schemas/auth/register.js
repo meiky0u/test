@@ -1,65 +1,48 @@
 import joi from 'joi';
 
-const registerSchema = joi.object({
-    firstName: joi
+const nameField = () =>
+    joi
         .string()
         .min(2)
         .max(30)
         .pattern(/^[a-zA-Z]+$/)
         .trim()
-        .lowercase()
+        .lowercase();
+
+const phoneNumberSchema = joi.object({
+    countryCallingCode: joi.string().required(),
+    nationalNumber: joi.string().required(),
+    number: joi.string().required(),
+});
+
+const registerSchema = joi.object({
+    firstName: nameField()
         .required()
         .messages({
             'string.empty': 'First name is required.',
-            'any.required': 'First name is required.'
+            'any.required': 'First name is required.',
         }),
-    middleName: joi
-        .string()
-        .min(2)
-        .max(30)
-        .pattern(/^[a-zA-Z]+$/)
-        .trim()
-        .lowercase()
-        .optional(),
-    lastName: joi
-        .string()
-        .min(2)
-        .max(30)
-        .pattern(/^[a-zA-Z]+$/)
-        .trim()
-        .lowercase()
+    middleName: nameField().optional(),
+    lastName: nameField()
         .required()
         .messages({
             'string.empty': 'Last name is required.',
-            'any.required': 'Last name is required.'
+            'any.required': 'Last name is required.',
         }),
     emailAddress: joi
         .string()
-        .email({ tlds: { allow: false } })
+        .email()
         .trim()
-        .lowercase(),
+        .lowercase()
+        .messages({
+            'string.email': 'Invalid email address.',
+        }),
     phoneNumber: joi
-        .when('emailAddress', {
-            switch: [
-                {
-                    // if emailAddress is not provided, then phoneNumber is required.
-                    is: joi
-                        .string()
-                        .empty('')
-                        .required(),
-                    then: joi.object({
-                        countryCallingCode: joi
-                        .string().required(),
-                        nationalNumber: joi.string().required(),
-                        number: joi.string().required()
-                    }),
-                    otherwise: joi.object({
-                        countryCallingCode: joi.string().optional(),
-                        nationalNumber: joi.string().optional(),
-                        number: joi.string().optional()
-                    })
-                }
-            ]
+        .alternatives()
+        .conditional('emailAddress', {
+            is: joi.string().empty(''),
+            then: phoneNumberSchema.required(),
+            otherwise: phoneNumberSchema.optional(),
         }),
     username: joi
         .string()
@@ -79,8 +62,8 @@ const registerSchema = joi.object({
         .required()
         .messages({
             'string.empty': 'Password is required.',
-            'any.required': 'Password is required.'
-        })
+            'any.required': 'Password is required.',
+        }),
 });
 
 export default registerSchema;
