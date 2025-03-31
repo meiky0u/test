@@ -50,6 +50,7 @@ export default function register(fastify, options, done) {
 
             // Parses phone number.
             let parsedPhoneNumber = null;
+            
             if (req.body.phoneNumber) {
                 const phoneNumber = req.body.phoneNumber;
                 parsedPhoneNumber = parsePhoneNumber(phoneNumber);
