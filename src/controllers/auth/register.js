@@ -16,11 +16,9 @@ export default function register(fastify, options, done) {
 
             try {
                 await registerSchema.validateAsync(req.body, { abortEarly: false });
-
                 console.log('Successfully validated the request body!');
             } catch (error) {
                 console.error(`An error has occurred while attempting to validate the request body! => ${error}`);
-
                 return rep.status(400).send({
                     message: 'Invalid request body!',
                 });
@@ -36,16 +34,15 @@ export default function register(fastify, options, done) {
                     $or: [
                         { emailAddress: req.body.emailAddress },
                         { username: req.body.username },
-                        { phoneNumber: req.body.phoneNumber }
-                    ]
+                        { phoneNumber: req.body.phoneNumber },
+                    ],
                 });
             } catch (error) {
                 console.error(`An error has occurred while attempting to check if the user already exists in the database! => ${error}`);
-
                 return rep.status(500).send({
                     message: 'An internal server error occurred.',
                 });
-            };
+            }
 
             // If the user already exists, return a 409 error.
             if (doesUserExist) {
@@ -54,7 +51,7 @@ export default function register(fastify, options, done) {
                 const takenFields = [
                     emailAddress && `${emailAddress} is already taken!`,
                     username && `${username} is already taken!`,
-                    phoneNumber?.number && `${phoneNumber.number} is already taken!`
+                    phoneNumber?.number && `${phoneNumber.number} is already taken!`,
                 ].filter(Boolean);
 
                 return rep.status(409).send({ message: 'Conflict', details: takenFields });
@@ -68,7 +65,9 @@ export default function register(fastify, options, done) {
                 parsedPhoneNumber = parsePhoneNumber(phoneNumber);
 
                 // Checks if the phone number is valid. If the phone number is not valid, return a 400 error.
-                if(!parsedPhoneNumber || !parsedPhoneNumber.isValid()) return rep.status(400).send({ message: 'Invalid phone number!' });
+                if (!parsedPhoneNumber || !parsedPhoneNumber.isValid()) {
+                    return rep.status(400).send({ message: 'Invalid phone number!' });
+                }
             }
 
             // Encrypts the user password.
@@ -78,11 +77,10 @@ export default function register(fastify, options, done) {
                 encryptedPassword = await bcrypt.hash(req.body.password, 10);
             } catch (error) {
                 console.error(`An error has occurred while attempting to encrypt the user password! => ${error}`);
-
                 return rep.status(500).send({
                     message: 'An internal server error occurred.',
                 });
-            };
+            }
 
             // Creates the user in the database.
             const user = await User.create({
@@ -91,21 +89,20 @@ export default function register(fastify, options, done) {
                 password: encryptedPassword,
                 verification: {
                     code: {
-                        value: crypto.randomBytes(3).toString('hex')
-                    }
-                }
+                        value: crypto.randomBytes(3).toString('hex'),
+                    },
+                },
             });
 
             console.log('Successfully created the user!');
 
             // Removes the password and verification code from the user object before sending it to the client.
             const { password, verification, ...safeUser } = user.toObject();
-            
+
             return rep.status(201).send(safeUser);
         } catch (error) {
             // TODO: Service that sends the error to a logging service.
             console.error(`An error has occurred while attempting to register the user! => ${error}`);
-
             return rep.status(500).send({ message: 'An internal server error occurred.' });
         }
     });
